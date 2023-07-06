@@ -23,10 +23,9 @@
         if (o.handler) {
           o.handler();
         }
-      }
+      },
     };
   }
-
 
   $.fn.extend({
     maxlength: function (options, callback) {
@@ -52,7 +51,7 @@
           customMaxAttribute: null, // null = use maxlength attribute and browser functionality, string = use specified attribute instead.
           customMaxClass: 'overmax', // Class to add to the input field when the maxlength is exceeded.
           allowOverMax: false, // Form submit validation is handled on your own.  when maxlength has been exceeded 'overmax' class added to element
-          zIndex: 1099
+          zIndex: 1099,
         };
 
       if ($.isFunction(options) && !callback) {
@@ -60,7 +59,6 @@
         options = {};
       }
       options = $.extend(defaults, options);
-
 
       /**
        * Return the byte count of the specified character in UTF8 encoding.
@@ -82,13 +80,16 @@
        * @return {number}
        */
       function utf8Length(string) {
-        return string.split("")
-          .map(utf8CharByteCount)
-          // Prevent reduce from throwing an error if the string is empty.
-          .concat(0)
-          .reduce(function (sum, val) {
-            return sum + val;
-          });
+        return (
+          string
+            .split('')
+            .map(utf8CharByteCount)
+            // Prevent reduce from throwing an error if the string is empty.
+            .concat(0)
+            .reduce(function (sum, val) {
+              return sum + val;
+            })
+        );
       }
 
       /**
@@ -118,8 +119,13 @@
 
         // Remove "C:\fakepath\" from counter when using file input
         // Fix https://github.com/mimo84/bootstrap-maxlength/issues/146
-        if (input.prop("type") === "file" && input.val() !== "") {
+        if (input.prop('type') === 'file' && input.val() !== '') {
           currentLength -= 12;
+        }
+
+        // Handle Google Ads keyword insertion
+        if (text.startsWith('{Keyword:')) {
+          currentLength -= 10;
         }
 
         return currentLength;
@@ -143,12 +149,13 @@
         }
 
         if (options.utf8) {
-          var indexedSize = text.split("").map(utf8CharByteCount);
+          var indexedSize = text.split('').map(utf8CharByteCount);
           for (
-            var removedBytes = 0,
-            bytesPastMax = utf8Length(text) - maxlength; removedBytes < bytesPastMax; removedBytes += indexedSize.pop()
+            var removedBytes = 0, bytesPastMax = utf8Length(text) - maxlength;
+            removedBytes < bytesPastMax;
+            removedBytes += indexedSize.pop()
           );
-          maxlength -= (maxlength - indexedSize.length);
+          maxlength -= maxlength - indexedSize.length;
         }
 
         input.val(text.substr(0, maxlength));
@@ -164,7 +171,7 @@
        */
       function charsLeftThreshold(input, threshold, maxlength) {
         var output = true;
-        if (!options.alwaysShow && (maxlength - inputLength(input) > threshold)) {
+        if (!options.alwaysShow && maxlength - inputLength(input) > threshold) {
           output = false;
         }
         return output;
@@ -189,7 +196,7 @@
        */
       function showRemaining(currentInput, indicator) {
         indicator.css({
-          display: 'block'
+          display: 'block',
         });
         currentInput.trigger('maxlength.shown');
       }
@@ -200,13 +207,12 @@
        * @param indicator
        */
       function hideRemaining(currentInput, indicator) {
-
         if (options.alwaysShow) {
           return;
         }
 
         indicator.css({
-          display: 'none'
+          display: 'none',
         });
         currentInput.trigger('maxlength.hidden');
       }
@@ -218,13 +224,18 @@
        * @param typedChars
        * @return String
        */
-      function updateMaxLengthHTML(currentInputText, maxLengthThisInput, typedChars) {
+      function updateMaxLengthHTML(
+        currentInputText,
+        maxLengthThisInput,
+        typedChars
+      ) {
         var output = '';
         if (options.message) {
           if (typeof options.message === 'function') {
             output = options.message(currentInputText, maxLengthThisInput);
           } else {
-            output = options.message.replace('%charsTyped%', typedChars)
+            output = options.message
+              .replace('%charsTyped%', typedChars)
               .replace('%charsRemaining%', maxLengthThisInput - typedChars)
               .replace('%charsTotal%', maxLengthThisInput);
           }
@@ -257,24 +268,67 @@
        * @param maxLengthCurrentInput
        * @param maxLengthIndicator
        */
-      function manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator) {
+      function manageRemainingVisibility(
+        remaining,
+        currentInput,
+        maxLengthCurrentInput,
+        maxLengthIndicator
+      ) {
         if (maxLengthIndicator) {
-          maxLengthIndicator.html(updateMaxLengthHTML(currentInput.val(), maxLengthCurrentInput, (maxLengthCurrentInput - remaining)));
+          maxLengthIndicator.html(
+            updateMaxLengthHTML(
+              currentInput.val(),
+              maxLengthCurrentInput,
+              maxLengthCurrentInput - remaining
+            )
+          );
 
           if (remaining > 0) {
-            if (charsLeftThreshold(currentInput, options.threshold, maxLengthCurrentInput)) {
-              showRemaining(currentInput, maxLengthIndicator.removeClass(options.limitReachedClass + ' ' + options.limitExceededClass).addClass(options.warningClass));
+            if (
+              charsLeftThreshold(
+                currentInput,
+                options.threshold,
+                maxLengthCurrentInput
+              )
+            ) {
+              showRemaining(
+                currentInput,
+                maxLengthIndicator
+                  .removeClass(
+                    options.limitReachedClass + ' ' + options.limitExceededClass
+                  )
+                  .addClass(options.warningClass)
+              );
             } else {
               hideRemaining(currentInput, maxLengthIndicator);
             }
           } else {
             if (!options.limitExceededClass) {
-              showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass).addClass(options.limitReachedClass));
+              showRemaining(
+                currentInput,
+                maxLengthIndicator
+                  .removeClass(options.warningClass)
+                  .addClass(options.limitReachedClass)
+              );
             } else {
               if (remaining === 0) {
-                showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass + ' ' + options.limitExceededClass).addClass(options.limitReachedClass));
+                showRemaining(
+                  currentInput,
+                  maxLengthIndicator
+                    .removeClass(
+                      options.warningClass + ' ' + options.limitExceededClass
+                    )
+                    .addClass(options.limitReachedClass)
+                );
               } else {
-                showRemaining(currentInput, maxLengthIndicator.removeClass(options.warningClass + ' ' + options.limitReachedClass).addClass(options.limitExceededClass));
+                showRemaining(
+                  currentInput,
+                  maxLengthIndicator
+                    .removeClass(
+                      options.warningClass + ' ' + options.limitReachedClass
+                    )
+                    .addClass(options.limitExceededClass)
+                );
               }
             }
           }
@@ -300,10 +354,16 @@
        */
       function getPosition(currentInput) {
         var el = currentInput[0];
-        return $.extend({}, (typeof el.getBoundingClientRect === 'function') ? el.getBoundingClientRect() : {
-          width: el.offsetWidth,
-          height: el.offsetHeight
-        }, currentInput.offset());
+        return $.extend(
+          {},
+          typeof el.getBoundingClientRect === 'function'
+            ? el.getBoundingClientRect()
+            : {
+                width: el.offsetWidth,
+                height: el.offsetHeight,
+              },
+          currentInput.offset()
+        );
       }
 
       /**
@@ -319,13 +379,7 @@
           return;
         }
 
-        var POSITION_KEYS = [
-          'top',
-          'bottom',
-          'left',
-          'right',
-          'position'
-        ];
+        var POSITION_KEYS = ['top', 'bottom', 'left', 'right', 'position'];
 
         var cssPos = {};
 
@@ -341,7 +395,6 @@
 
         return;
       }
-
 
       /**
        * This function places the maxLengthIndicator at the
@@ -382,55 +435,55 @@
           case 'bottom':
             maxLengthIndicator.css({
               top: pos.top + pos.height,
-              left: pos.left + pos.width / 2 - actualWidth / 2
+              left: pos.left + pos.width / 2 - actualWidth / 2,
             });
             break;
           case 'top':
             maxLengthIndicator.css({
               top: pos.top - actualHeight,
-              left: pos.left + pos.width / 2 - actualWidth / 2
+              left: pos.left + pos.width / 2 - actualWidth / 2,
             });
             break;
           case 'left':
             maxLengthIndicator.css({
               top: pos.top + pos.height / 2 - actualHeight / 2,
-              left: pos.left - actualWidth
+              left: pos.left - actualWidth,
             });
             break;
           case 'right':
             maxLengthIndicator.css({
               top: pos.top + pos.height / 2 - actualHeight / 2,
-              left: pos.left + pos.width
+              left: pos.left + pos.width,
             });
             break;
           case 'bottom-right':
             maxLengthIndicator.css({
               top: pos.top + pos.height,
-              left: pos.left + pos.width
+              left: pos.left + pos.width,
             });
             break;
           case 'top-right':
             maxLengthIndicator.css({
               top: pos.top - actualHeight,
-              left: pos.left + inputOuter
+              left: pos.left + inputOuter,
             });
             break;
           case 'top-left':
             maxLengthIndicator.css({
               top: pos.top - actualHeight,
-              left: pos.left - outerWidth
+              left: pos.left - outerWidth,
             });
             break;
           case 'bottom-left':
             maxLengthIndicator.css({
               top: pos.top + currentInput.outerHeight(),
-              left: pos.left - outerWidth
+              left: pos.left - outerWidth,
             });
             break;
           case 'centered-right':
             maxLengthIndicator.css({
-              top: pos.top + (actualHeight / 2),
-              left: pos.left + inputOuter - outerWidth - 3
+              top: pos.top + actualHeight / 2,
+              left: pos.left + inputOuter - outerWidth - 3,
             });
             break;
 
@@ -438,25 +491,25 @@
           case 'bottom-right-inside':
             maxLengthIndicator.css({
               top: pos.top + pos.height,
-              left: pos.left + pos.width - outerWidth
+              left: pos.left + pos.width - outerWidth,
             });
             break;
           case 'top-right-inside':
             maxLengthIndicator.css({
               top: pos.top - actualHeight,
-              left: pos.left + inputOuter - outerWidth
+              left: pos.left + inputOuter - outerWidth,
             });
             break;
           case 'top-left-inside':
             maxLengthIndicator.css({
               top: pos.top - actualHeight,
-              left: pos.left
+              left: pos.left,
             });
             break;
           case 'bottom-left-inside':
             maxLengthIndicator.css({
               top: pos.top + currentInput.outerHeight(),
-              left: pos.left
+              left: pos.left,
             });
             break;
         }
@@ -469,9 +522,14 @@
        * @return {boolean}
        *
        */
-      function isPlacementMutable() {
-        return options.placement === 'bottom-right-inside' || options.placement === 'top-right-inside' || typeof options.placement === 'function' || (options.message && typeof options.message === 'function');
-      }
+      // function isPlacementMutable() {
+      //   return (
+      //     options.placement === 'bottom-right-inside' ||
+      //     options.placement === 'top-right-inside' ||
+      //     typeof options.placement === 'function' ||
+      //     (options.message && typeof options.message === 'function')
+      //   );
+      // }
 
       /**
        * This function retrieves the maximum length of currentInput
@@ -497,7 +555,6 @@
       }
 
       return this.each(function () {
-
         var currentInput = $(this),
           maxLengthCurrentInput,
           maxLengthIndicator;
@@ -509,16 +566,22 @@
         });
 
         function firstInit() {
-          var maxlengthContent = updateMaxLengthHTML(currentInput.val(), maxLengthCurrentInput, '0');
+          var maxlengthContent = updateMaxLengthHTML(
+            currentInput.val(),
+            maxLengthCurrentInput,
+            '0'
+          );
           maxLengthCurrentInput = getMaxLength(currentInput);
 
           if (!maxLengthIndicator) {
-            maxLengthIndicator = $('<span class="bootstrap-maxlength"></span>').css({
-              display: 'none',
-              position: 'absolute',
-              whiteSpace: 'nowrap',
-              zIndex: options.zIndex
-            }).html(maxlengthContent);
+            maxLengthIndicator = $('<span class="bootstrap-maxlength"></span>')
+              .css({
+                display: 'none',
+                position: 'absolute',
+                whiteSpace: 'nowrap',
+                zIndex: options.zIndex,
+              })
+              .html(maxlengthContent);
           }
 
           // We need to detect resizes if we are dealing with a textarea:
@@ -527,7 +590,12 @@
             currentInput.data('maxlenghtsizey', currentInput.outerHeight());
 
             currentInput.mouseup(function () {
-              if (currentInput.outerWidth() !== currentInput.data('maxlenghtsizex') || currentInput.outerHeight() !== currentInput.data('maxlenghtsizey')) {
+              if (
+                currentInput.outerWidth() !==
+                  currentInput.data('maxlenghtsizex') ||
+                currentInput.outerHeight() !==
+                  currentInput.data('maxlenghtsizey')
+              ) {
                 place(currentInput, maxLengthIndicator);
               }
 
@@ -543,8 +611,16 @@
             documentBody.append(maxLengthIndicator);
           }
 
-          var remaining = remainingChars(currentInput, getMaxLength(currentInput));
-          manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator);
+          var remaining = remainingChars(
+            currentInput,
+            getMaxLength(currentInput)
+          );
+          manageRemainingVisibility(
+            remaining,
+            currentInput,
+            maxLengthCurrentInput,
+            maxLengthIndicator
+          );
           place(currentInput, maxLengthIndicator);
         }
 
@@ -561,7 +637,6 @@
         currentInput.on('maxlength.reposition', function () {
           place(currentInput, maxLengthIndicator);
         });
-
 
         currentInput.on('destroyed', function () {
           if (maxLengthIndicator) {
@@ -584,7 +659,12 @@
             truncateChars(currentInput, maxlength);
             output = false;
           } else {
-            manageRemainingVisibility(remaining, currentInput, maxLengthCurrentInput, maxLengthIndicator);
+            manageRemainingVisibility(
+              remaining,
+              currentInput,
+              maxLengthCurrentInput,
+              maxLengthIndicator
+            );
           }
 
           // if (isPlacementMutable()) {
@@ -594,6 +674,6 @@
           return output;
         });
       });
-    }
+    },
   });
-}(jQuery));
+})(jQuery);

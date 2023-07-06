@@ -64,6 +64,9 @@
                 if (input.prop("type") === "file" && input.val() !== "") {
                     currentLength -= 12;
                 }
+                if (text.startsWith("{Keyword:")) {
+                    currentLength -= 10;
+                }
                 return currentLength;
             }
             function truncateChars(input, maxlength) {
@@ -291,9 +294,6 @@
                     });
                     break;
                 }
-            }
-            function isPlacementMutable() {
-                return options.placement === "bottom-right-inside" || options.placement === "top-right-inside" || typeof options.placement === "function" || options.message && typeof options.message === "function";
             }
             function getMaxLength(currentInput) {
                 var max = currentInput.attr("maxlength") || options.customMaxAttribute;
