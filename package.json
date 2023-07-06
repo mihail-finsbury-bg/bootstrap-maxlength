@@ -1,7 +1,7 @@
 {
   "name": "@mhivanov/bootstrap-maxlength",
-  "version": "1.10.0",
-  "version_short": "1.10",
+  "version": "2.0.0",
+  "version_short": "2.0",
   "description": "A visual feedback indicator for the MaxLength attribute",
   "main": "dist/bootstrap-maxlength.js",
   "repository": {
