@@ -139,6 +139,7 @@
        */
       function truncateChars(input, maxlength) {
         var text = input.val();
+        maxlength = parseInt(maxlength);
 
         if (options.twoCharLinebreak) {
           text = text.replace(/\r(?!\n)|\n(?!\r)/g, '\r\n');
@@ -156,6 +157,10 @@
             removedBytes += indexedSize.pop()
           );
           maxlength -= maxlength - indexedSize.length;
+        }
+
+        if (text.startsWith('{Keyword:')) {
+          maxlength += 10;
         }
 
         input.val(text.substr(0, maxlength));
